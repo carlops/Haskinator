@@ -1,8 +1,8 @@
 data Oraculo = Prediccion String | Pregunta String Oraculo Oraculo deriving Read
 
 instance Show Oraculo where
-	show (Prediccion str)  = "{" ++ str ++ "}"
-	show (Pregunta str izq der) = "¿" ++ str ++ "<" ++ show izq ++ "|" ++ show der ++">"
+	show (Prediccion str)  = "(Pred:" ++ str ++ ")"
+	show (Pregunta str izq der) = "((" ++ str ++ ")(" ++ show izq ++ ")(" ++ show der ++") )"
 {--
 instance Read Oraculo where
 	read strCompleto = readOra strCompleto where
@@ -10,6 +10,18 @@ instance Read Oraculo where
 		readOra ('¿':ys) = crearPregunta ys  (readOra xs)
 		readOra  () = 
 --}
+
+instance Read Oraculo where
+	readsPrec d str = readParen (d > 10) 
+			   (\str -> if first == "Prediccion:" then crearPrediccion (readToQuotes second)
+				    else if first = "Pregunta:" then crearPregunta (readToQuotes second) (readsPrec d readAfterQuotes second) ()
+			   ) str  
+		where first =  (fst . head . lex) str 
+		      second =  (snd . head . lex) str 
+		      readToQuotes (x:xs) = takeWhile (/='"') xs 
+		      readAfterQuotes (x:xs) = tail . dropWhile (/='"') xs 	
+--Haskinator = Oraculo
+
 crearPrediccion :: String -> Oraculo
 crearPrediccion pred = Prediccion pred
 
@@ -43,7 +55,7 @@ obtenerCadena (Pregunta preg izq der) pred =
 		else Nothing
 
 
-main = printMenu
+main =  menu Nothing 
 
 printMenu = do 
 	putStrLn ("1  Crear un oráculo nuevo ")
@@ -53,7 +65,7 @@ printMenu = do
 	putStrLn ("5: Consultar pregunta crucial ")
 	putStrLn ("6: Consultar estadísticas ")
 
-menu = do 
+menu orac = do 
 	printMenu
 	{--n <- getChar
 	case n of 1 -> putChar(n) 
