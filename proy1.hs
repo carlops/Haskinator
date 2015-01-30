@@ -82,9 +82,11 @@ cargar = do
 	return ora
  --}
 
+-- CAGANDOLAAA
+{--
 preguntaCrucial :: Maybe Oraculo -> IO()
 preguntaCrucial Nothing = putStrLn "No se pueden realizar consultas, Oraculo vacio"
-preguntaCrucial Just ora = do
+preguntaCrucial (Just ora) = do
 				putStrLn "Introduzca Primera prediccion: "
 			    	pred1 <- getLine
 				putStrLn "Introduzca Segunda prediccion: "
@@ -93,7 +95,7 @@ preguntaCrucial Just ora = do
 				cadena2 <- obtenerCadena ora pred2
 				if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida"
 				else  putStrLn "Consulta Invalida"
-		{--			filtrado <- ((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2
+					filtrado <- ((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2
 					if  (filtrado == Just []) then
 					 	putStrLn "Consulta Invalida"
 					else
@@ -113,7 +115,7 @@ printmenu = do
 	putStrLn ("6: Consultar estadísticas ")
 
 menu orac = do 
-	printMenu
+	printmenu
 	{--n <- getChar
 	case n of 1 -> putChar(n) 
 		  2 -> putChar(n)
