@@ -3,15 +3,36 @@ import Data.Maybe
 data Oraculo = Prediccion String | Pregunta String Oraculo Oraculo deriving Read
 
 instance Show Oraculo where
-	show (Prediccion str)  = "{" ++ str ++ "}"
-	show (Pregunta str izq der) = "¿" ++ str ++ "<" ++ show izq ++ "|" ++ show der ++">"
+	show (Prediccion str)  = "(Pred: " ++ str ++ ")"
+	show (Pregunta str izq der) = "(¿: " ++ str ++ " (" ++ show izq ++ "," ++ show der ++")"
 {--
 instance Read Oraculo where
 	read strCompleto = readOra strCompleto where
 		readOra ('!':'{':ys) = crearPrediccion (takeWhile (/='}') ys) readOra (tail . dropWhile(/='}') ys)
-		readOra ('¿':ys) = crearPregunta ys  (readOra xs)
-		readOra  () = 
+		readOra ('¿':ys) = crearPregunta ys  (readOra xs) 
 --}
+{--
+instance Read Oraculo where
+	readsPrec d str = readParen (d > 10) (\str -> if first str == "Pred: " then crearPrediccion (readToQuotes second str)
+		else if first str == "¿:" 
+		then crearPregunta (readToQuotes second str) (readsPrec d (fst resto str)) (readsPrec d (snd resto str))
+		else error "not readable") 
+--}
+
+leer str = if first str == "Pred: " then crearPrediccion (readToQuotes (second str))
+	else if first str == "¿:" 
+	then crearPregunta (readToQuotes $ second str) (leer (fst (resto str))) (leer (snd (resto str)))
+	else crearPrediccion ("<" ++ (readToQuotes (second str)) ++">") 
+
+first =  takeWhile (/=' ') 
+second =  tail . dropWhile (/='\"') 
+readToQuotes (x:xs) = takeWhile (/='\"') xs 
+dropToQuotes (x:xs) = tail $ dropWhile (/='\"') xs
+tupla s = read s :: (String, String) 
+--resto :: String -> (String,String)
+resto str = tupla (dropToQuotes (second str))
+--Haskinator = Oraculo
+
 crearPrediccion :: String -> Oraculo
 crearPrediccion pred = Prediccion pred
 
@@ -91,7 +112,7 @@ printmenu = do
 	putStrLn ("5: Consultar pregunta crucial ")
 	putStrLn ("6: Consultar estadísticas ")
 
-menu = do 
+menu orac = do 
 	printMenu
 	{--n <- getChar
 	case n of 1 -> putChar(n) 
