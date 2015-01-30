@@ -1,4 +1,5 @@
 import Data.Maybe
+import Control.Applicative
 
 data Oraculo = Prediccion String | Pregunta String Oraculo Oraculo deriving Read
 
@@ -82,28 +83,24 @@ cargar = do
 	return ora
  --}
 
--- CAGANDOLAAA
-{--
+-- Falta acomodar cuando una misma pregunta esta en caminos distintos 
+
 preguntaCrucial :: Maybe Oraculo -> IO()
 preguntaCrucial Nothing = putStrLn "No se pueden realizar consultas, Oraculo vacio"
 preguntaCrucial (Just ora) = do
-				putStrLn "Introduzca Primera prediccion: "
-			    	pred1 <- getLine
-				putStrLn "Introduzca Segunda prediccion: "
-			    	pred2 <- getLine
-				cadena1 <- obtenerCadena ora pred1
-				cadena2 <- obtenerCadena ora pred2
-				if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida"
-				else  putStrLn "Consulta Invalida"
-					filtrado <- ((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2
-					if  (filtrado == Just []) then
-					 	putStrLn "Consulta Invalida"
-					else
-						putStrLn fromJust (fmap (fst . last) filtrado)
-
---}
-
-
+		putStrLn "Introduzca Primera prediccion: "
+		pred1 <- getLine
+		putStrLn "Introduzca Segunda prediccion: "
+		pred2 <- getLine
+		let cadena1 = obtenerCadena ora pred1
+		let cadena2 = obtenerCadena ora pred2
+		putStrLn (show (fromJust cadena1))
+		putStrLn (show (fromJust cadena))
+		let filtrado = (((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2)
+		if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida1"
+		else if  (filtrado == Just []) then putStrLn "Consulta Invalida2"
+		else putStrLn (fromJust (fmap (fst . last) filtrado))
+				
 main = printmenu
 
 printmenu = do 
