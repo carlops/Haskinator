@@ -66,7 +66,32 @@ obtenerCadena (Pregunta preg izq der) pred =
 		if ys/=Nothing then fmap ((preg,False):) ys 
 		else Nothing
 
+--obtenerEstadistica :: Oraculo -> (Integer, Integer, Integer)
+--obtenerEstadistica ora = let res = (estadistica ora (99999,0,(1,1)) 1) in
+--			(extFirst res,extSecond res, (fst . extThird res) / (snd . extThird res))
+				 
+extFirst :: (a,b,c) -> a
+extFirst (a,_,_) = a
 
+extSecond :: (a,b,c) -> b
+extSecond (_,b,_) = b
+
+extThird :: (a,b,c) -> c
+extThird (_,_,c) = c
+
+
+estadistica :: Oraculo -> (Integer, Integer,(Integer,Integer)) -> Integer -> (Integer, Integer,(Integer,Integer))
+estadistica (Prediccion s) (x,y,z) n = (minimo,maximo,(suma,cantidad))
+			where minimo = if x>n then n else x
+			      maximo = if y<n then n else y
+			      suma = (fst z) + 4
+			      cantidad = (snd z) + 1
+estadistica (Pregunta s ora1 ora2) tripleta piso = compara (estadistica ora1 tripleta (piso+1)) (estadistica ora2 tripleta (piso+1))
+
+compara :: (Integer, Integer,(Integer,Integer)) -> (Integer, Integer,(Integer,Integer)) -> (Integer, Integer,(Integer,Integer))
+compara (x,y,z) (a,b,c) = (min x a,max y b,((fst z)+(fst c),(snd z)+(snd c)))
+ 
+-------------------- IO ------------------------------------
 persistir :: Maybe Oraculo -> IO()
 persistir ora = do
 		putStrLn "Introduzca un nombre para el archivo donde se guardara el oraculo"
@@ -94,8 +119,6 @@ preguntaCrucial (Just ora) = do
 		pred2 <- getLine
 		let cadena1 = obtenerCadena ora pred1
 		let cadena2 = obtenerCadena ora pred2
-		putStrLn (show (fromJust cadena1))
-		putStrLn (show (fromJust cadena))
 		let filtrado = (((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2)
 		if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida1"
 		else if  (filtrado == Just []) then putStrLn "Consulta Invalida2"
