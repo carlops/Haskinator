@@ -126,6 +126,16 @@ preguntaCrucial (Just ora) = do
 		else if  (filtrado == Just []) then putStrLn "Consulta Invalida2"
 		else putStrLn (fromJust (fmap (fst . last) filtrado))
 				
+consultarEstadistica :: Maybe Oraculo -> IO()
+consultarEstadistica Nothing = putStrLn "No se pueden realizar consultas, Oraculo vacio"
+consultarEstadistica (Just ora) = do
+			let tripleta = obtenerEstadistica ora
+			putStrLn "Minimo Numero de Preguntas: "
+			putStrLn (show $extFirst tripleta)
+			putStrLn "Maximo Numero de Preguntas: "
+			putStrLn (show $extSecond tripleta)
+			putStrLn "Promedio de Preguntas a Realizar: "
+			putStrLn (show $extThird tripleta)
 main = printmenu
 
 printmenu = do 
