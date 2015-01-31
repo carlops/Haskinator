@@ -68,7 +68,7 @@ obtenerCadena (Pregunta preg izq der) pred =
 
 obtenerEstadistica :: Oraculo -> (Integer, Integer, Integer)
 obtenerEstadistica ora = (extFirst res,extSecond res, promedio)
-		where res = (estadistica ora (99999,0,(1,1)) 1)
+		where res = (estadistica ora (99999,0,(0,0)) 0)
 		      x = (fst (extThird res))
 		      y = (snd (extThird res))
 		      promedio = div x y
@@ -121,10 +121,11 @@ preguntaCrucial (Just ora) = do
 		pred2 <- getLine
 		let cadena1 = obtenerCadena ora pred1
 		let cadena2 = obtenerCadena ora pred2
-		let filtrado = (((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2)
+		let auxfun = (\c1 c2 -> [x | x <- c1, any (\a -> if ((fst a) == (fst x) && (snd a) /= (snd x)) then True else False) c2])
+		let filtrado = ((auxfun) <$> cadena1 <*> cadena2)
 		if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida1"
 		else if  (filtrado == Just []) then putStrLn "Consulta Invalida2"
-		else putStrLn (fromJust (fmap (fst . last) filtrado))
+		else putStrLn (fromJust (fmap (fst . head) filtrado))
 				
 consultarEstadistica :: Maybe Oraculo -> IO()
 consultarEstadistica Nothing = putStrLn "No se pueden realizar consultas, Oraculo vacio"
@@ -157,4 +158,3 @@ menu orac = do
 		  6 -> putChar(n)
 		  _ -> putStr("Opcion no válida, inserte un número entre 1 y 6\n")
 	main--}
-
