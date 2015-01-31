@@ -94,12 +94,44 @@ compara :: (Integer, Integer,(Integer,Integer)) -> (Integer, Integer,(Integer,In
 compara (x,y,z) (a,b,c) = (min x a,max y b,((fst z)+(fst c),(snd z)+(snd c)))
  
 -------------------- IO ------------------------------------
+
+predecir :: Maybe Oraculo -> Maybe Oraculo 
+predecir Nothing = do
+		putStrLn "El Oraculo se encuentra vacio, por favor responda a las iguientes peticiones."
+		putStrLn "Ingrese una pregunta:"
+		pregunta <- getLine
+		putStrLn "Ingrese la respuesta posivita, a la pregunta ingresada"
+		resp1 <- getLine
+		putStrLn "Ahora ingrese la respuesta negativa"
+		resp0 <- getLine
+		putStrLn "Oraculo creado!, ahora si puedo adivinar todos tus pensamientos!"	
+		return (Just (crearPregunta (pregunta) (crearPrediccion resp1) (crearPrediccion resp2)))
+predecir ora = recorrer ora Nothing ora
+
+recorrer :: Maybe Oraculo -> Maybe Oraculo -> Maybe Oraculo -> Maybe Oraculo
+recorrer (Just (Pregunta s oraPositivo oraNegativo)) padre raiz = do
+		putStrLn s
+		putStrLn "Responda escribiendo si o no"
+		respuesta <- getLine
+		if (respuesta == "si") then recorrer (Just oraPositivo) (Just (Pregunta s oraPositivo oraNegativo)) raiz 
+		else if (respuesta == "no") then recorrer (Just oraNegativo) (Just (Pregunta s oraPositivo oraNegativo)) raiz
+		else putStrLn "Respuesta invalida"
+		     return raiz
+
+recorrer (Just (Prediccion s)) padre raiz = do
+		putStrLn "Pude ver en tu mente que lo que buscas es!!"
+		putStrLn s
+		putStrLn "Su respuesta fue acertada?"
+		putStrLn "Responda escribiendo si, de lo contrario escriba cualquier cosa"
+		respuesta <- getLine
+	--	if (respuesta == "si") then return raiz
+	--	else insertar (Just (Prediccion s)) padre
 persistir :: Maybe Oraculo -> IO()
 persistir ora = do
 		putStrLn "Introduzca un nombre para el archivo donde se guardara el oraculo"
 		namefile <- getLine
 		writeFile namefile (show ora)
-		putStrLn "Persistencia completada"
+		putStrLn "El Oraculo ahora perdurara por siglos!"
 {--
 cargar :: Maybe Oraculo
 cargar = do
