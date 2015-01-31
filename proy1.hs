@@ -5,7 +5,7 @@ data Oraculo = Prediccion String | Pregunta String Oraculo Oraculo deriving Read
 
 instance Show Oraculo where
 	show (Prediccion str)  = "(Pred: " ++ str ++ ")"
-	show (Pregunta str izq der) = "(¿: " ++ str ++ " (" ++ show izq ++ "," ++ show der ++")"
+	show (Pregunta str izq der) = "(Preg: " ++ str ++ " (" ++ show izq ++ "," ++ show der ++")"
 {--
 instance Read Oraculo where
 	read strCompleto = readOra strCompleto where
@@ -20,7 +20,7 @@ instance Read Oraculo where
 		else error "not readable") 
 --}
 
-leer str = if first str == "Pred: " then crearPrediccion (readToQuotes (second str))
+leer str = if first str == "Preg: " then crearPrediccion (readToQuotes (second str))
 	else if first str == "¿:" 
 	then crearPregunta (readToQuotes $ second str) (leer (fst (resto str))) (leer (snd (resto str)))
 	else crearPrediccion ("<" ++ (readToQuotes (second str)) ++">") 
@@ -66,10 +66,12 @@ obtenerCadena (Pregunta preg izq der) pred =
 		if ys/=Nothing then fmap ((preg,False):) ys 
 		else Nothing
 
---obtenerEstadistica :: Oraculo -> (Integer, Integer, Integer)
---obtenerEstadistica ora = let res = (estadistica ora (99999,0,(1,1)) 1) in
---			(extFirst res,extSecond res, (fst . extThird res) / (snd . extThird res))
-				 
+obtenerEstadistica :: Oraculo -> (Integer, Integer, Integer)
+obtenerEstadistica ora = (extFirst res,extSecond res, promedio)
+		where res = (estadistica ora (99999,0,(1,1)) 1)
+		      x = (fst (extThird res))
+		      y = (snd (extThird res))
+		      promedio = div x y
 extFirst :: (a,b,c) -> a
 extFirst (a,_,_) = a
 
@@ -84,7 +86,7 @@ estadistica :: Oraculo -> (Integer, Integer,(Integer,Integer)) -> Integer -> (In
 estadistica (Prediccion s) (x,y,z) n = (minimo,maximo,(suma,cantidad))
 			where minimo = if x>n then n else x
 			      maximo = if y<n then n else y
-			      suma = (fst z) + 4
+			      suma = (fst z) + n
 			      cantidad = (snd z) + 1
 estadistica (Pregunta s ora1 ora2) tripleta piso = compara (estadistica ora1 tripleta (piso+1)) (estadistica ora2 tripleta (piso+1))
 
