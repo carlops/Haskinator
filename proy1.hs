@@ -136,7 +136,8 @@ consultarEstadistica (Just ora) = do
 			putStrLn (show $extSecond tripleta)
 			putStrLn "Promedio de Preguntas a Realizar: "
 			putStrLn (show $extThird tripleta)
-main = printmenu
+
+main = menu Nothing
 
 printmenu = do 
 	putStrLn ("1  crear un oráculo nuevo ")
@@ -145,16 +146,19 @@ printmenu = do
 	putStrLn ("4: Cargar ")
 	putStrLn ("5: Consultar pregunta crucial ")
 	putStrLn ("6: Consultar estadísticas ")
+	putStrLn ("7: Salir")
 
 menu orac = do 
 	printmenu
-	{--n <- getChar
-	case n of 1 -> putChar(n) 
-		  2 -> putChar(n)
-		  3 -> putChar(n)
-		  4 -> putChar(n)
-		  5 -> putChar(n)
-		  6 -> putChar(n)
-		  _ -> putStr("Opcion no válida, inserte un número entre 1 y 6\n")
-	main--}
+	[n] <- getChar
+--	read n :: Int
+	case n of 1 -> putStrLn("1") 
+		  2 -> putStrLn("2")
+		  3 -> putStrLn("3")
+		  4 -> putStrLn("4")
+		  5 -> putStrLn("5")
+		  6 -> putStrLn("6")
+		  7 -> return()
+		  _ -> putStrLn("Opcion no válida, inserte un número entre 1 y 7\n")
+	main
 
