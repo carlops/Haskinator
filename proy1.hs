@@ -68,7 +68,7 @@ obtenerCadena (Pregunta preg izq der) pred =
 
 obtenerEstadistica :: Oraculo -> (Integer, Integer, Integer)
 obtenerEstadistica ora = (extFirst res,extSecond res, promedio)
-		where res = (estadistica ora (99999,0,(1,1)) 1)
+		where res = (estadistica ora (99999,0,(0,0)) 0)
 		      x = (fst (extThird res))
 		      y = (snd (extThird res))
 		      promedio = div x y
@@ -94,12 +94,44 @@ compara :: (Integer, Integer,(Integer,Integer)) -> (Integer, Integer,(Integer,In
 compara (x,y,z) (a,b,c) = (min x a,max y b,((fst z)+(fst c),(snd z)+(snd c)))
  
 -------------------- IO ------------------------------------
+
+predecir :: Maybe Oraculo -> Maybe Oraculo 
+predecir Nothing = do
+		putStrLn "El Oraculo se encuentra vacio, por favor responda a las iguientes peticiones."
+		putStrLn "Ingrese una pregunta:"
+		pregunta <- getLine
+		putStrLn "Ingrese la respuesta posivita, a la pregunta ingresada"
+		resp1 <- getLine
+		putStrLn "Ahora ingrese la respuesta negativa"
+		resp0 <- getLine
+		putStrLn "Oraculo creado!, ahora si puedo adivinar todos tus pensamientos!"	
+		return (Just (crearPregunta (pregunta) (crearPrediccion resp1) (crearPrediccion resp2)))
+predecir ora = recorrer ora Nothing ora
+
+recorrer :: Maybe Oraculo -> Maybe Oraculo -> Maybe Oraculo -> Maybe Oraculo
+recorrer (Just (Pregunta s oraPositivo oraNegativo)) padre raiz = do
+		putStrLn s
+		putStrLn "Responda escribiendo si o no"
+		respuesta <- getLine
+		if (respuesta == "si") then recorrer (Just oraPositivo) (Just (Pregunta s oraPositivo oraNegativo)) raiz 
+		else if (respuesta == "no") then recorrer (Just oraNegativo) (Just (Pregunta s oraPositivo oraNegativo)) raiz
+		else putStrLn "Respuesta invalida"
+		     return raiz
+
+recorrer (Just (Prediccion s)) padre raiz = do
+		putStrLn "Pude ver en tu mente que lo que buscas es!!"
+		putStrLn s
+		putStrLn "Su respuesta fue acertada?"
+		putStrLn "Responda escribiendo si, de lo contrario escriba cualquier cosa"
+		respuesta <- getLine
+	--	if (respuesta == "si") then return raiz
+	--	else insertar (Just (Prediccion s)) padre
 persistir :: Maybe Oraculo -> IO()
 persistir ora = do
 		putStrLn "Introduzca un nombre para el archivo donde se guardara el oraculo"
 		namefile <- getLine
 		writeFile namefile (show ora)
-		putStrLn "Persistencia completada"
+		putStrLn "El Oraculo ahora perdurara por siglos!"
 {--
 cargar :: Maybe Oraculo
 cargar = do
@@ -121,10 +153,11 @@ preguntaCrucial (Just ora) = do
 		pred2 <- getLine
 		let cadena1 = obtenerCadena ora pred1
 		let cadena2 = obtenerCadena ora pred2
-		let filtrado = (((\c1 c2 -> [x | x <- c1, any (\a -> (fst a) == (fst x)) c2])) <$> cadena1 <*> cadena2)
+		let auxfun = (\c1 c2 -> [x | x <- c1, any (\a -> if ((fst a) == (fst x) && (snd a) /= (snd x)) then True else False) c2])
+		let filtrado = ((auxfun) <$> cadena1 <*> cadena2)
 		if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida1"
 		else if  (filtrado == Just []) then putStrLn "Consulta Invalida2"
-		else putStrLn (fromJust (fmap (fst . last) filtrado))
+		else putStrLn (fromJust (fmap (fst . head) filtrado))
 				
 consultarEstadistica :: Maybe Oraculo -> IO()
 consultarEstadistica Nothing = putStrLn "No se pueden realizar consultas, Oraculo vacio"
