@@ -3,7 +3,9 @@
     Autores: Carlo Polisado 09-10672
 	     Alejandro Guevara 09-10971
 --}
-module Oraculo  where
+module Oraculo (Oraculo(Prediccion,Pregunta),crearPrediccion,crearPregunta, prediccion,pregunta,positivo,negativo,obtenerCadena,obtenerEstadistica)  where
+
+import Data.List
 
 data Oraculo = Prediccion String | Pregunta String Oraculo Oraculo deriving (Read,Show)
 
@@ -26,15 +28,25 @@ instance Read Oraculo where
 		else error "not readable") 
 --}
 
-leer str = if first str == "Preg: " then crearPrediccion (readToQuotes (second str))
-	else if first str == "¿:" 
-	then crearPregunta (readToQuotes $ second str) (leer (fst (resto str))) (leer (snd (resto str)))
-	else crearPrediccion ("<" ++ (readToQuotes (second str)) ++">") 
 
+leer str = if isPrefixOf "Pred:" str then crearPrediccion $ (readToQuotes . dropToQuotes) str 
+	else if isPrefixOf "¿:" str 
+	then crearPregunta str2 (leer (readPregunta str2 0)) (leer (readPregunta (drop (length (readPregunta str2 0)) str2) 0))
+	else crearPrediccion str2
+	where str2 = (readToQuotes . dropToQuotes) str
+{--
+		crearPregunta (readToQuotes $ second str) (leer (fst (resto str))) (leer (snd (resto str)))
+	else crearPrediccion ("<" ++ (readToQuotes (second str)) ++">") 
+--}
+readPregunta ('}':xs) 1 = "}" 
+readPregunta ('}':xs) n = '}':(readPregunta xs (n-1)) 
+readPregunta ('{':xs) n = '{':(readPregunta xs (n+1))  
+readPregunta (x:xs) n = x:(readPregunta xs n)
+ 
 first =  takeWhile (/=' ') 
 second =  tail . dropWhile (/='\"') 
 readToQuotes (x:xs) = takeWhile (/='\"') xs 
-dropToQuotes (x:xs) = tail $ dropWhile (/='\"') xs
+dropToQuotes (x:xs) = dropWhile (/='\"') xs
 tupla s = read s :: (String, String) 
 --resto :: String -> (String,String)
 resto str = tupla (dropToQuotes (second str))
@@ -72,12 +84,12 @@ obtenerCadena (Pregunta preg izq der) pred =
 		if ys/=Nothing then fmap ((preg,False):) ys 
 		else Nothing
 
-obtenerEstadistica :: Oraculo -> (Integer, Integer, Integer)
+obtenerEstadistica :: Oraculo -> (Integer, Integer, Float)
 obtenerEstadistica ora = (extFirst res,extSecond res, promedio)
 		where res = (estadistica ora (99999,0,(0,0)) 0)
 		      x = (fst (extThird res))
 		      y = (snd (extThird res))
-		      promedio = div x y
+		      promedio = fromIntegral x / fromIntegral y
 extFirst :: (a,b,c) -> a
 extFirst (a,_,_) = a
 

@@ -9,15 +9,17 @@ import Data.Maybe
 import Control.Applicative
 import Oraculo
 
+-- hSetBuffering stdin LineBuffering
+
 -- Recibe un Maybe Oraculo y checkea que la entrada no este 'vacia'
 -- Luego se apoya en la funcion 'recorrer' para recorrer el arbol
 predecir :: Maybe Oraculo -> IO()
 predecir Nothing = do
 		putStrLn "\n"
-		putStrLn "El Oraculo se encuentra vacio, por favor responda a las iguientes peticiones."
+		putStrLn "El Oraculo se encuentra vacio, por favor responda a las siguientes peticiones."
 		putStrLn "Ingrese una pregunta:"
 		pregunta <- getLine
-		putStrLn "Ingrese la respuesta posivita, a la pregunta ingresada"
+		putStrLn "Ingrese la respuesta posivita a la pregunta ingresada"
 		resp1 <- getLine
 		putStrLn "Ahora ingrese la respuesta negativa"
 		resp2 <- getLine
@@ -47,7 +49,7 @@ recorrer (Just (Pregunta s ora1 ora2)) padre = do
 
 recorrer (Just (Prediccion s)) padre = do
 		putStrLn "\n"
-		putStrLn "Pude ver en tu mente que lo que buscas es!!"
+		putStrLn "Pude ver en tu mente que lo que buscas es..."
 		putStrLn s
 		putStrLn "\n"
 		putStrLn "la respuesta fue acertada?"
@@ -73,7 +75,7 @@ persistir ora = do
 		putStrLn "Introduzca un nombre para el archivo donde se guardara el oraculo"
 		namefile <- getLine
 		writeFile namefile (show ora)
-		putStrLn "El Oraculo ahora perdurara por siglos!"
+		putStrLn "¡El Oraculo ahora perdurara por siglos!"
 		menu ora
 
 cargar :: IO()
@@ -83,7 +85,7 @@ cargar = do
 	namefile <- getLine
 	aux <- readFile namefile
 	putStrLn "Ya tengo mas conocimientos del pasado!"
-	putStrLn "Presione cualquier cosa para continuar"
+	putStrLn "\nPresione Enter para continuar"
 	a <- getLine
 	menu (read aux :: (Maybe Oraculo))
 
@@ -105,9 +107,9 @@ preguntaCrucial (Just ora) = do
 		if (cadena1==Nothing || cadena2==Nothing) then putStrLn "Consulta Invalida"
 		else if  (filtrado == Just []) then putStrLn "Consulta Invalida"
 		else do
-			putStrLn "La Pregunta Crucial para ello es!: "
+			putStrLn "La Pregunta Crucial para ello es: "
 			putStrLn (fromJust (fmap (fst . head) filtrado))
-		putStrLn "Presione cualquier cosa para continuar"
+		putStrLn "Presione Enter para continuar"
 		a <- getLine
 		menu (Just ora)
 				
@@ -125,9 +127,18 @@ consultarEstadistica (Just ora) = do
 			putStrLn (show $extSecond tripleta)
 			putStrLn "Promedio de Preguntas a Realizar: "
 			putStrLn (show $extThird tripleta)
-			putStrLn "Presione cualquier cosa para continuar"
+			putStrLn "Presione Enter para continuar"
 			aux <- getLine
 			menu (Just ora)
+
+extFirst :: (a,b,c) -> a
+extFirst (a,_,_) = a
+
+extSecond :: (a,b,c) -> b
+extSecond (_,b,_) = b
+
+extThird :: (a,b,c) -> c
+extThird (_,_,c) = c
 
 main :: IO()
 main = menu Nothing

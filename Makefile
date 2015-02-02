@@ -1,10 +1,14 @@
+# Makefile para Haskinator 
 all: haskinator
 
-haskinator:  
-ghc --make Haskinator.hs
+haskinator: 
+	ghc --make Haskinator.hs
 
-clear_terminal:
-  :! clear
+#SRCS = Haskinator.hs Oraculo.hs 
+#HS_PROG = haskinator
+
+#clear_terminal:
+#  :! clear
 
 clean:
-rm -f ./*.o ./*.hi Haskinator
+	rm -f ./*.o ./*.hi
