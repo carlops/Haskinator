@@ -5,11 +5,10 @@
 --}
 module Haskinator (main) where
 
+import System.IO
 import Data.Maybe
 import Control.Applicative
 import Oraculo
-
--- hSetBuffering stdin LineBuffering
 
 -- Recibe un Maybe Oraculo y checkea que la entrada no este 'vacia'
 -- Luego se apoya en la funcion 'recorrer' para recorrer el arbol
@@ -144,8 +143,8 @@ main :: IO()
 main = menu Nothing
 
 menu :: Maybe Oraculo -> IO ()
-menu orac = do
-
+menu orac = do	
+	 hSetBuffering stdin LineBuffering
 	 putStrLn "\n\n _______________________________ "
 	 putStrLn " "
 	 putStrLn "     Bienvenido a Haskinator       "
@@ -176,5 +175,5 @@ menu orac = do
 	     "5" -> preguntaCrucial orac
 	     "6" -> consultarEstadistica orac
 	     "7" -> return ()
-	     -- _ -> do 
+	     _ -> menu orac
 
