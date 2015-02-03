@@ -3,7 +3,7 @@
     Autores: Carlo Polisano 09-10672
 	     Alejandro Guevara 09-10971
 --}
-module Haskinator (main) where
+module Main (main) where
 
 import System.IO
 import Data.Maybe
